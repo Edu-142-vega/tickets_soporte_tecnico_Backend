@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post } from "@nestjs/common";
 import { CategoriesService } from "./categories.service";
 import { CreateCategoryDto } from "./dto/create-category.dto";
 
+
 @Controller('categories')
 export class CategoriesController {
   constructor(private service: CategoriesService) {}
@@ -10,6 +11,7 @@ export class CategoriesController {
   create(@Body() dto: CreateCategoryDto) {
     return this.service.create(dto);
   }
+
 
   @Get()
   findAll() {
