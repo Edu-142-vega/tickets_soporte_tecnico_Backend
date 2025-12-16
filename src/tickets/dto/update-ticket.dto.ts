@@ -1,8 +1,19 @@
-import { IsOptional } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateTicketDto {
-  @IsOptional() title?: string;
-  @IsOptional() description?: string;
-  @IsOptional() priority?: string;
-  @IsOptional() category?: string;
+  @IsOptional()
+  @IsString()
+  titulo?: string;
+
+  @IsOptional()
+  @IsString()
+  descripcion?: string;
+
+  @IsOptional()
+  @IsString()
+  estado?: string;
+
+  @IsOptional()
+  @IsString()
+  prioridad?: string;
 }
