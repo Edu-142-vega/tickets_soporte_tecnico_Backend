@@ -1,14 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
-
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
-    register(dto: RegisterDto) {
-        throw new Error('Method not implemented.');
-    }
-    login(dto: LoginDto) {
-        throw new Error('Method not implemented.');
-    }
+  register(dto: CreateUserDto) {
+    return {
+      message: 'Usuario registrado correctamente',
+      user: dto,
+    };
+  }
+
+  login(dto: any) {
+    return {
+      message: 'Login correcto',
+      user: dto,
+    };
+  }
 }
