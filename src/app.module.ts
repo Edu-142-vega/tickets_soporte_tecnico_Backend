@@ -4,9 +4,16 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { TecnicosModule } from './tecnico/tecnico.module';
+import { ServicioModule } from './servicio/servicio.module';
+import { CompraModule } from './compra/compra.module';
+import { Detalle_compraModule } from './detalle_compra/detalle_compra.module';
+
+
+
 
 @Module({
   imports: [
+    
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -20,9 +27,17 @@ import { TecnicosModule } from './tecnico/tecnico.module';
       //ssl: { rejectUnauthorized: false },
     }),
     TecnicosModule,
+    ServicioModule,
+    CompraModule,
+    Detalle_compraModule,
   ],
   controllers: [AppController],
   providers: [AppService],
   
 })
 export class AppModule {}
+
+
+
+
+

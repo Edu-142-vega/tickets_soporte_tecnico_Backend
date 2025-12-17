@@ -1,3 +1,3 @@
-nest generate module tecnico
-nest generate controller tecnico
-nest generate service tecnico
+nest generate module detalle_compra
+nest generate controller detalle_compra
+nest generate service detalle_compra 
