@@ -3,17 +3,17 @@ import { IsOptional, IsString } from 'class-validator';
 export class UpdateTicketDto {
   @IsOptional()
   @IsString()
-  titulo?: string;
+  titulo: string;
 
   @IsOptional()
   @IsString()
-  descripcion?: string;
+  descripcion: string;
 
   @IsOptional()
   @IsString()
-  estado?: string;
+  estado: string;
 
   @IsOptional()
   @IsString()
-  prioridad?: string;
+  prioridad: string;
 }
