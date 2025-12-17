@@ -22,18 +22,21 @@ export class Detalle_comprasService {
   }
 
   findOne(id: string) {
-    return this.detalle_compraRepository.findOne({ where: { id } });
+    return this.detalle_compraRepository.findOne({where: { id_detalle_compra: id }
+ });
   }
 
   async update(id: string, updateDetalle_compraDto: UpdateDetalle_compraDto) {
-    const detalle_compra = await this.detalle_compraRepository.findOne({ where: { id } });
+    const detalle_compra = await this.detalle_compraRepository.findOne({ where: { id_detalle_compra: id }
+ });
     if (!detalle_compra) return null;
     Object.assign(detalle_compra, updateDetalle_compraDto);
     return this.detalle_compraRepository.save(detalle_compra);
   }
 
   async remove(id: string) {
-    const detalle_compra = await this.detalle_compraRepository.findOne({ where: { id } });
+    const detalle_compra = await this.detalle_compraRepository.findOne({ where: { id_detalle_compra: id }
+ });
     if (!detalle_compra) return null;
     return this.detalle_compraRepository.remove(detalle_compra);
   }
