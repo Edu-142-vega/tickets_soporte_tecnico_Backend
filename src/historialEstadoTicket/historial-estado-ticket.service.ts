@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { HistorialEstadoTicket } from './historialEstadoTicket.entity';
 import { CreateHistorialEstadoTicketDto } from './dto/create-historialEstadoTicket.dto';
 import { UpdateHistorialEstadoTicketDto } from './dto/update-historialEstadoTicket.dto';
+import { paginate, IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
+
 
 @Injectable()
 export class HistorialEstadoTicketService {
@@ -17,8 +19,9 @@ export class HistorialEstadoTicketService {
     return this.historialRepository.save(historial);
   }
 
-  findAll() {
-    return this.historialRepository.find();
+  async findAll(options: IPaginationOptions): Promise<Pagination<HistorialEstadoTicket>> {
+    const queryBuilder = this.historialRepository.createQueryBuilder('historial');
+    return paginate<HistorialEstadoTicket>(queryBuilder, options);
   }
 
   findOne(id: string) {

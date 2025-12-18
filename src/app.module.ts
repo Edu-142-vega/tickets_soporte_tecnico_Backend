@@ -4,6 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TicketsModule } from './tickets/tickets.module';
+import { AsignacionTicketModule } from './asignacionTicket/asignacion-ticket.module';
+import { HistorialEstadoTicketModule } from './historialEstadoTicket/historial-estado-ticket.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { TicketsModule } from './tickets/tickets.module';
     }),
 
     TicketsModule,
+    AsignacionTicketModule,
+    HistorialEstadoTicketModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Ticket } from './ticket.entity';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { paginate, IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
+
 
 
 @Injectable()
@@ -18,8 +20,9 @@ export class TicketsService {
     return this.ticketRepository.save(ticket);
   }
 
-  findAll() {
-    return this.ticketRepository.find();
+   async findAll(options: IPaginationOptions): Promise<Pagination<Ticket>> {
+    const queryBuilder = this.ticketRepository.createQueryBuilder('ticket');
+    return paginate<Ticket>(queryBuilder, options);
   }
 
   findOne(id: string) {

@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
 import { HistorialEstadoTicketService } from './historial-estado-ticket.service';
 import { CreateHistorialEstadoTicketDto } from './dto/create-historialEstadoTicket.dto';
 import { UpdateHistorialEstadoTicketDto } from './dto/update-historialEstadoTicket.dto';
+import { Pagination } from 'nestjs-typeorm-paginate/dist/pagination';
+import { HistorialEstadoTicket } from './historialEstadoTicket.entity';
 
 @Controller('historialEstadoTicket')
 export class HistorialEstadoTicketController {
@@ -13,8 +15,12 @@ export class HistorialEstadoTicketController {
   }
 
   @Get()
-  findAll() {
-    return this.historialEstadoTicketService.findAll();
+  findAll(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<Pagination<HistorialEstadoTicket>> {
+    limit = limit > 100 ? 100 : limit;
+    return this.historialEstadoTicketService.findAll({ page, limit });
   }
 
   @Get(':id')

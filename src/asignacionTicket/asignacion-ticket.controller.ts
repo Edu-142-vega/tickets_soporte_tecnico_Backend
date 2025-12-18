@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
 import { AsignacionTicketService } from './asignacion-ticket.service';
 import { CreateAsignacionTicketDto } from './dto/create-asignacionTicket.dto';
 import { UpdateAsignacionTicketDto } from './dto/update-asignacionTicket.dto';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { AsignacionTicket } from './asignacionTicket.entity';
 
 @Controller('asignacionTicket')
 export class AsignacionTicketController {
@@ -13,8 +15,12 @@ export class AsignacionTicketController {
   }
 
   @Get()
-  findAll() {
-    return this.asignacionTicketService.findAll();
+  findAll(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<Pagination<AsignacionTicket>> {
+    limit = limit > 100 ? 100 : limit;
+    return this.asignacionTicketService.findAll({ page, limit });
   }
 
   @Get(':id')
