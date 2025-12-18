@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
 import { ComprasService } from './compra.service';
 import { CreateCompraDto } from './dto/create-compra.dto';
 import { UpdateCompraDto } from './dto/update-compra.dto';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { Compra } from './compra.entity';
 
 @Controller('compras')
 export class ComprasController {
@@ -12,9 +14,13 @@ export class ComprasController {
     return this.comprasService.create(createCompraDto);
   }
 
-  @Get()
-  findAll() {
-    return this.comprasService.findAll();
+   @Get()
+  findAll(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<Pagination<Compra>> {
+    limit = limit > 100 ? 100 : limit;
+    return this.comprasService.findAll({ page, limit });
   }
 
   @Get(':id')

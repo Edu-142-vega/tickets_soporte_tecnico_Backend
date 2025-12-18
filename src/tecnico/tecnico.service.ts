@@ -1,3 +1,4 @@
+import { paginate, IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -18,8 +19,9 @@ export class TecnicoService {
   );
 }
 
-  findAll() {
-    return this.tecnicoRepository.find();
+  async findAll(options: IPaginationOptions): Promise<Pagination<Tecnico>> {
+    const queryBuilder = this.tecnicoRepository.createQueryBuilder('tecnico');
+    return paginate<Tecnico>(queryBuilder, options);
   }
 
   findOne(id: string) {

@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
 import { TecnicoService } from 'src/tecnico/tecnico.service';
 import { CreateTecnicoDto } from 'src/tecnico/dto/create-tecnico.dto';
 import { UpdateTecnicoDto } from 'src/tecnico/dto/update-tecnico.dto';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { Tecnico } from './tecnico.entity';
 
 @Controller('tecnicos')
 export class TecnicoController {
@@ -13,8 +15,12 @@ export class TecnicoController {
   }
 
   @Get()
-  findAll() {
-    return this.tecnicosService.findAll();
+  findAll(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<Pagination<Tecnico>> {
+    limit = limit > 100 ? 100 : limit;
+    return this.tecnicosService.findAll({ page, limit });
   }
 
   @Get(':id')

@@ -1,3 +1,4 @@
+import { paginate, IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,8 +18,9 @@ export class ComprasService {
     return this.compraRepository.save(compra);
   }
 
-  findAll() {
-    return this.compraRepository.find();
+   async findAll(options: IPaginationOptions): Promise<Pagination<Compra>> {
+    const queryBuilder = this.compraRepository.createQueryBuilder('compra');
+    return paginate<Compra>(queryBuilder, options);
   }
 
   findOne(id: string) {
