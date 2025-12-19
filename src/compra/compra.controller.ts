@@ -1,41 +1,35 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
-import { ComprasService } from './compra.service';
+import { Controller, Get, Post, Body, Param, Put, Delete, Query } from '@nestjs/common';
+import { CompraService } from './compra.service';
 import { CreateCompraDto } from './dto/create-compra.dto';
 import { UpdateCompraDto } from './dto/update-compra.dto';
-import { Pagination } from 'nestjs-typeorm-paginate';
-import { Compra } from './compra.entity';
+import { QueryDto } from 'src/common/dto/query.dto';
 
 @Controller('compras')
 export class ComprasController {
-  constructor(private readonly comprasService: ComprasService) {}
+  constructor(private readonly compraService: CompraService) {}
 
   @Post()
-  create(@Body() createCompraDto: CreateCompraDto) {
-    return this.comprasService.create(createCompraDto);
+  create(@Body() dto: CreateCompraDto) {
+    return this.compraService.create(dto);
   }
 
-   @Get()
-  findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
-  ): Promise<Pagination<Compra>> {
-    limit = limit > 100 ? 100 : limit;
-    return this.comprasService.findAll({ page, limit });
+  @Get()
+  findAll(@Query() query: QueryDto) {
+    return this.compraService.findAll(query);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.comprasService.findOne(id);
+    return this.compraService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateCompraDto: UpdateCompraDto) {
-    return this.comprasService.update(id, updateCompraDto);
+  update(@Param('id') id: string, @Body() dto: UpdateCompraDto) {
+    return this.compraService.update(id, dto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.comprasService.remove(id);
+    return this.compraService.remove(id);
   }
 }
-
