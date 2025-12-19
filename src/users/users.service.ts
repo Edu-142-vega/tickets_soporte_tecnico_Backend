@@ -1,25 +1,35 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
+import { paginate,IPaginationOptions, Pagination,} from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = []; // simulación BD
+  constructor(
+    @InjectRepository(User)
+    private readonly repository: Repository<User>,
+  ) {}
 
-  create(dto: CreateUserDto) {
-    const user: User = {
-      id: this.users.length + 1,
+  async create(dto: CreateUserDto): Promise<User> {
+    const user = this.repository.create({
       nombre: dto.nombre,
       email: dto.email,
       password: dto.password,
       createdAt: new Date(),
-    };
+    });
 
-    this.users.push(user);
-    return user;
+    return this.repository.save(user);
   }
 
-  findAll() {
-    return this.users;
+  async findAll(
+    options: IPaginationOptions,
+  ): Promise<Pagination<User>> {
+    const queryBuilder = this.repository.createQueryBuilder('user');
+
+    queryBuilder.orderBy('user.createdAt', 'DESC');
+
+    return paginate<User>(queryBuilder, options);
   }
 }

@@ -10,4 +10,8 @@ export class Comment {
 
   @CreateDateColumn()
   createdAt: Date;
+  
+  @Column()
+  ticketId: number;
+
 }
