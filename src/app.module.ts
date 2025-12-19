@@ -7,8 +7,7 @@ import { TecnicosModule } from './tecnico/tecnico.module';
 import { ServicioModule } from './servicio/servicio.module';
 import { CompraModule } from './compra/compra.module';
 import { Detalle_compraModule } from './detalle_compra/detalle_compra.module';
-
-
+//import { MongooseModule } from '@nestjs/mongoose';  // Importar Mongoose
 
 
 @Module({

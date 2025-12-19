@@ -10,3 +10,4 @@ import { Compra } from './compra.entity';
   providers: [ComprasService],
 })
 export class CompraModule {}
+
