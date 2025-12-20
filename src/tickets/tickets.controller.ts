@@ -1,0 +1,40 @@
+import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import { TicketsService } from './tickets.service';
+import { CreateTicketDto } from './dto/create-ticket.dto';
+import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { Ticket } from './ticket.entity';
+import { Pagination } from 'nestjs-typeorm-paginate';
+
+@Controller('tickets')
+export class TicketsController {
+  constructor(private readonly ticketsService: TicketsService) {}
+
+  @Post()
+  create(@Body() createTicketDto: CreateTicketDto) {
+    return this.ticketsService.create(createTicketDto);
+  }
+
+  @Get()
+  findAll(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<Pagination<Ticket>> {
+    limit = limit > 100 ? 100 : limit;
+    return this.ticketsService.findAll({ page, limit });
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.ticketsService.findOne(id);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() updateTicketDto: UpdateTicketDto) {
+    return this.ticketsService.update(id, updateTicketDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.ticketsService.remove(id);
+  }
+}
