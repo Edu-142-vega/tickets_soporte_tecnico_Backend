@@ -1,17 +1,16 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column,CreateDateColumn,} from 'typeorm';
 
 @Entity('comments')
 export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column('text')
   mensaje: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
-  
   @Column()
   ticketId: number;
 
+  @CreateDateColumn()
+  createdAt: Date;
 }

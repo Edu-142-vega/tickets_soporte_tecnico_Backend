@@ -1,13 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import {paginate,IPaginationOptions,Pagination,} from 'nestjs-typeorm-paginate';
+
 import { Category } from './category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import {
-  paginate,
-  IPaginationOptions,
-  Pagination,
-} from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class CategoriesService {
@@ -16,18 +13,34 @@ export class CategoriesService {
     private readonly categoriesRepository: Repository<Category>,
   ) {}
 
+
   async create(dto: CreateCategoryDto): Promise<Category> {
-    const category = this.categoriesRepository.create(dto);
-    return this.categoriesRepository.save(category);
+    try {
+      const category = this.categoriesRepository.create(dto);
+      return await this.categoriesRepository.save(category);
+    } catch (error) {
+      console.error('Error al crear la categoría:', error);
+      throw new InternalServerErrorException(
+        'No se pudo crear la categoría',
+      );
+    }
   }
+
 
   async findAll(
     options: IPaginationOptions,
   ): Promise<Pagination<Category>> {
-    const queryBuilder = this.categoriesRepository
-      .createQueryBuilder('category')
-      .orderBy('category.id', 'DESC');
+    try {
+      const queryBuilder = this.categoriesRepository
+        .createQueryBuilder('category')
+        .orderBy('category.id', 'DESC');
 
-    return paginate<Category>(queryBuilder, options);
+      return await paginate<Category>(queryBuilder, options);
+    } catch (error) {
+      console.error('Error al listar categorías:', error);
+      throw new InternalServerErrorException(
+        'No se pudieron obtener las categorías',
+      );
+    }
   }
 }
