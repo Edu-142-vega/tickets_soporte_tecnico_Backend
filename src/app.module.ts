@@ -1,20 +1,20 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { TicketsModule } from './tickets/tickets.module';
+import { AsignacionTicketModule } from './asignacionTicket/asignacion-ticket.module';
+import { HistorialEstadoTicketModule } from './historialEstadoTicket/historial-estado-ticket.module';
 import { TecnicosModule } from './tecnico/tecnico.module';
 import { ServicioModule } from './servicio/servicio.module';
 import { CompraModule } from './compra/compra.module';
 import { Detalle_compraModule } from './detalle_compra/detalle_compra.module';
-//import { MongooseModule } from '@nestjs/mongoose';  // Importar Mongoose
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 
-
 @Module({
   imports: [
-    
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -25,8 +25,10 @@ import { MailModule } from './mail/mail.module';
       database: process.env.DB_NAME,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
-      //ssl: { rejectUnauthorized: false },
     }),
+    TicketsModule,
+    AsignacionTicketModule,
+    HistorialEstadoTicketModule,
     TecnicosModule,
     ServicioModule,
     CompraModule,
@@ -36,11 +38,5 @@ import { MailModule } from './mail/mail.module';
   ],
   controllers: [AppController],
   providers: [AppService],
-  
 })
 export class AppModule {}
-
-
-
-
-
