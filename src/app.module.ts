@@ -20,7 +20,7 @@ import { Comment } from './comments/comment.entity';
       password: 'postgres',
       database: 'soporte_tecnico',
       entities: [User, Category, Comment],
-      synchronize: true, // SOLO desarrollo
+      synchronize: true, 
     }),
 
     AuthModule,

@@ -1,9 +1,19 @@
-import {Injectable,InternalServerErrorException,} from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {paginate,IPaginationOptions,Pagination,} from 'nestjs-typeorm-paginate';
+import {
+  paginate,
+  IPaginationOptions,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
+
 import { Comment } from './comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Injectable()
 export class CommentsService {
@@ -31,7 +41,6 @@ export class CommentsService {
     }
   }
 
-
   async findAll(
     options: IPaginationOptions,
   ): Promise<Pagination<Comment>> {
@@ -45,6 +54,38 @@ export class CommentsService {
       console.error('Error al listar comentarios:', error);
       throw new InternalServerErrorException(
         'No se pudieron obtener los comentarios',
+      );
+    }
+  }
+
+  // ✅ UPDATE
+  async update(
+    id: number,
+    dto: UpdateCommentDto,
+  ): Promise<Comment> {
+    try {
+      const comment = await this.repository.findOne({
+        where: { id },
+      });
+
+      if (!comment) {
+        throw new NotFoundException(
+          `Comentario con id ${id} no encontrado`,
+        );
+      }
+
+      Object.assign(comment, dto);
+
+      return await this.repository.save(comment);
+    } catch (error) {
+      console.error('Error al actualizar comentario:', error);
+
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        'No se pudo actualizar el comentario',
       );
     }
   }
