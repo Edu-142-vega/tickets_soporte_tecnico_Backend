@@ -2,6 +2,7 @@ import {
   Controller, Get, Post, Put, Delete,
   Param, Body, Query,
   NotFoundException, InternalServerErrorException,
+  UseGuards,
 } from '@nestjs/common';
 
 import { CompraService } from './compra.service';
@@ -13,11 +14,13 @@ import { Compra } from './compra.entity';
 
 import { SuccessResponseDto } from 'src/common/dto/response.dto';
 import { QueryDto } from 'src/common/dto/query.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('compras')
 export class ComprasController {
   constructor(private readonly compraService: CompraService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   async create(@Body() dto: CreateCompraDto) {
     const compra = await this.compraService.create(dto);
@@ -44,6 +47,7 @@ export class ComprasController {
     return new SuccessResponseDto('Compra retrieved successfully', compra);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateCompraDto) {
     const compra = await this.compraService.update(id, dto);
@@ -51,6 +55,7 @@ export class ComprasController {
     return new SuccessResponseDto('Compra updated successfully', compra);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const compra = await this.compraService.remove(id);

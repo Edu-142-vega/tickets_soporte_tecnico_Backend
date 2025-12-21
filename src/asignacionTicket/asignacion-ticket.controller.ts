@@ -1,7 +1,8 @@
 import {
   Controller, Get, Post, Put, Delete,
   Param, Body, Query,
-  NotFoundException, InternalServerErrorException
+  NotFoundException, InternalServerErrorException,
+  UseGuards
 } from '@nestjs/common';
 
 import { AsignacionTicketService } from './asignacion-ticket.service';
@@ -13,11 +14,13 @@ import { AsignacionTicket } from './asignacionTicket.entity';
 
 import { SuccessResponseDto } from 'src/common/dto/response.dto';
 import { QueryDto } from 'src/common/dto/query.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('asignacionTicket')
 export class AsignacionTicketController {
   constructor(private readonly asignacionTicketService: AsignacionTicketService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   async create(@Body() dto: CreateAsignacionTicketDto) {
     const asignacion = await this.asignacionTicketService.create(dto);
@@ -45,6 +48,7 @@ export class AsignacionTicketController {
     return new SuccessResponseDto('AsignacionTicket retrieved successfully', asignacion);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateAsignacionTicketDto) {
     const asignacion = await this.asignacionTicketService.update(id, dto);
@@ -52,6 +56,7 @@ export class AsignacionTicketController {
     return new SuccessResponseDto('AsignacionTicket updated successfully', asignacion);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const asignacion = await this.asignacionTicketService.remove(id);

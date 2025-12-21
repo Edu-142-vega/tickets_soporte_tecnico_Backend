@@ -1,13 +1,16 @@
 import {
-  Controller, Get, Post, Param, Body, Query, InternalServerErrorException
+  Controller, Get, Post, Param, Body, Query, InternalServerErrorException,
+  UseGuards
 } from '@nestjs/common';
 import { MensajesTicketService } from './mensajes-ticket.service';
 import { CreateMensajeTicketDto } from './dto/create-mensaje-ticket.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('mensajes-ticket')
 export class MensajesTicketController {
   constructor(private readonly mensajesService: MensajesTicketService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   async create(@Body() dto: CreateMensajeTicketDto) {
     const mensaje = await this.mensajesService.create(dto);

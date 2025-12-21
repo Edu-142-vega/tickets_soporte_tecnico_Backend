@@ -1,12 +1,14 @@
-import {Controller,Post, Body,Param,Get,Query,} from '@nestjs/common';
+import {Controller,Post, Body,Param,Get,Query, UseGuards,} from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { IPaginationOptions } from 'nestjs-typeorm-paginate';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post(':ticketId')
   create(
     @Param('ticketId') ticketId: number,

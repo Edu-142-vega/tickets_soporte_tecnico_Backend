@@ -1,7 +1,11 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateCommentDto {
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   mensaje: string;
+
+  @IsNotEmpty()
+  @IsInt()
+  ticketId: number;
 }

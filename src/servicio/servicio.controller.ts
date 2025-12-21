@@ -1,7 +1,8 @@
 import {
   Controller, Get, Post, Put, Delete,
   Body, Param, Query,
-  NotFoundException, InternalServerErrorException
+  NotFoundException, InternalServerErrorException,
+  UseGuards
 } from '@nestjs/common';
 
 import { ServiciosService } from './servicio.service';
@@ -13,11 +14,13 @@ import { Servicio } from './servicio.entity';
 
 import { SuccessResponseDto } from 'src/common/dto/response.dto';
 import { QueryDto } from 'src/common/dto/query.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('servicios')
 export class ServiciosController {
   constructor(private readonly serviciosService: ServiciosService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   async create(@Body() dto: CreateServicioDto) {
     const servicio = await this.serviciosService.create(dto);
@@ -53,6 +56,7 @@ export class ServiciosController {
     return new SuccessResponseDto('Servicio retrieved successfully', servicio);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   async update(
     @Param('id') id: string,
@@ -65,6 +69,7 @@ export class ServiciosController {
     return new SuccessResponseDto('Servicio updated successfully', servicio);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const servicio = await this.serviciosService.remove(id);

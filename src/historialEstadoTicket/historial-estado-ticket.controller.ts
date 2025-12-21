@@ -1,7 +1,8 @@
 import {
   Controller, Get, Post, Put, Delete,
   Param, Body, Query,
-  NotFoundException, InternalServerErrorException
+  NotFoundException, InternalServerErrorException,
+  UseGuards
 } from '@nestjs/common';
 
 import { HistorialEstadoTicketService } from './historial-estado-ticket.service';
@@ -13,11 +14,13 @@ import { HistorialEstadoTicket } from './historialEstadoTicket.entity';
 
 import { SuccessResponseDto } from 'src/common/dto/response.dto';
 import { QueryDto } from 'src/common/dto/query.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('historialEstadoTicket')
 export class HistorialEstadoTicketController {
   constructor(private readonly historialEstadoTicketService: HistorialEstadoTicketService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   async create(@Body() dto: CreateHistorialEstadoTicketDto) {
     const historial = await this.historialEstadoTicketService.create(dto);
@@ -45,6 +48,7 @@ export class HistorialEstadoTicketController {
     return new SuccessResponseDto('HistorialEstadoTicket retrieved successfully', historial);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateHistorialEstadoTicketDto) {
     const historial = await this.historialEstadoTicketService.update(id, dto);
@@ -52,6 +56,7 @@ export class HistorialEstadoTicketController {
     return new SuccessResponseDto('HistorialEstadoTicket updated successfully', historial);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const historial = await this.historialEstadoTicketService.remove(id);

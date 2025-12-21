@@ -10,21 +10,14 @@ import { QueryDto } from 'src/common/dto/query.dto';
 
 @Injectable()
 export class HistorialEstadoTicketService {
-  remove(id: string) {
-    throw new Error('Method not implemented.');
-  }
-  update(id: string, dto: UpdateHistorialEstadoTicketDto) {
-    throw new Error('Method not implemented.');
-  }
-  findOne(id: string) {
-    throw new Error('Method not implemented.');
-  }
   constructor(
     @InjectRepository(HistorialEstadoTicket)
     private readonly historialRepository: Repository<HistorialEstadoTicket>,
   ) {}
 
-  async create(dto: CreateHistorialEstadoTicketDto): Promise<HistorialEstadoTicket | null> {
+  async create(
+    dto: CreateHistorialEstadoTicketDto,
+  ): Promise<HistorialEstadoTicket | null> {
     try {
       const historial = this.historialRepository.create(dto);
       return await this.historialRepository.save(historial);
@@ -34,7 +27,9 @@ export class HistorialEstadoTicketService {
     }
   }
 
-  async findAll(queryDto: QueryDto): Promise<Pagination<HistorialEstadoTicket> | null> {
+  async findAll(
+    queryDto: QueryDto,
+  ): Promise<Pagination<HistorialEstadoTicket> | null> {
     try {
       const { page, limit, search, searchField, sort, order } = queryDto;
 
@@ -75,4 +70,87 @@ export class HistorialEstadoTicketService {
 
             default:
               query.where(
-                `(historial.id_ticket::text ILIKE :search OR historial.estado_anterior ILIKE :search OR historial.estado_nuevo IL_
+                `(historial.id_ticket::text ILIKE :search 
+                  OR historial.estado_anterior ILIKE :search 
+                  OR historial.estado_nuevo ILIKE :search
+                  OR historial.fecha_cambio::text ILIKE :search
+                  OR historial.comentario ILIKE :search)`,
+                { search: `%${search}%` },
+              );
+              break;
+          }
+        } else {
+          query.where(
+            `(historial.id_ticket::text ILIKE :search 
+              OR historial.estado_anterior ILIKE :search 
+              OR historial.estado_nuevo ILIKE :search
+              OR historial.fecha_cambio::text ILIKE :search
+              OR historial.comentario ILIKE :search)`,
+            { search: `%${search}%` },
+          );
+        }
+      }
+
+      if (sort) {
+        query.orderBy(`historial.${sort}`, (order || 'ASC') as 'ASC' | 'DESC');
+      } else {
+        query.orderBy('historial.fecha_cambio', 'DESC');
+      }
+
+      return paginate<HistorialEstadoTicket>(query, {
+        page: Number(page) || 1,
+        limit: Number(limit) || 10,
+      });
+    } catch (err) {
+      console.error('Error finding historialEstadoTicket:', err);
+      return null;
+    }
+  }
+
+  async findOne(id: string): Promise<HistorialEstadoTicket | null> {
+    try {
+      const historial = await this.historialRepository.findOne({
+        where: { id_historial: id },
+      });
+      return historial ?? null;
+    } catch (err) {
+      console.error('Error finding historialEstadoTicket by id:', err);
+      return null;
+    }
+  }
+
+  async update(
+    id: string,
+    dto: UpdateHistorialEstadoTicketDto,
+  ): Promise<HistorialEstadoTicket | null> {
+    try {
+      const historial = await this.historialRepository.preload({
+        id_historial: id,
+        ...dto,
+      });
+
+      if (!historial) return null;
+
+      return await this.historialRepository.save(historial);
+    } catch (err) {
+      console.error('Error updating historialEstadoTicket:', err);
+      return null;
+    }
+  }
+
+  async remove(id: string): Promise<HistorialEstadoTicket | null> {
+    try {
+      const historial = await this.historialRepository.findOne({
+        where: { id_historial: id },
+      });
+
+      if (!historial) return null;
+
+      await this.historialRepository.remove(historial);
+      return historial;
+    } catch (err) {
+      console.error('Error removing historialEstadoTicket:', err);
+      return null;
+    }
+  }
+}

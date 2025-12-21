@@ -1,6 +1,7 @@
 import {
   Controller, Get, Post, Put, Delete,
-  Param, Body, Query, NotFoundException, InternalServerErrorException
+  Param, Body, Query, NotFoundException, InternalServerErrorException,
+  UseGuards
 } from '@nestjs/common';
 
 import { Detalle_comprasService } from './detalle_compra.service';
@@ -11,11 +12,13 @@ import { Detalle_compra } from './detalle_compra.entity';
 
 import { SuccessResponseDto } from 'src/common/dto/response.dto';
 import { QueryDto } from 'src/common/dto/query.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('detalle_compras')
 export class Detalle_comprasController {
   constructor(private readonly detalle_comprasService: Detalle_comprasService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   async create(@Body() dto: CreateDetalle_compraDto) {
     const detalle = await this.detalle_comprasService.create(dto);
@@ -44,6 +47,7 @@ export class Detalle_comprasController {
     return new SuccessResponseDto('Detalle_compra retrieved successfully', detalle);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateDetalle_compraDto) {
     const detalle = await this.detalle_comprasService.update(id, dto);
@@ -51,6 +55,7 @@ export class Detalle_comprasController {
     return new SuccessResponseDto('Detalle_compra updated successfully', detalle);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const detalle = await this.detalle_comprasService.remove(id);

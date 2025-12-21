@@ -1,7 +1,8 @@
 import {
-  Controller, Get, Post, Put, Delete,
-  Param, Body, Query, NotFoundException, InternalServerErrorException
+  Controller, Get, Post, Put, Delete, Body, Param, Query,
+  NotFoundException, InternalServerErrorException, UseGuards
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 import { TecnicoService } from './tecnico.service';
 import { CreateTecnicoDto } from './dto/create-tecnico.dto';
@@ -17,6 +18,7 @@ import { QueryDto } from 'src/common/dto/query.dto';
 export class TecnicoController {
   constructor(private readonly tecnicosService: TecnicoService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   async create(@Body() dto: CreateTecnicoDto) {
     const tecnico = await this.tecnicosService.create(dto);
@@ -45,6 +47,7 @@ export class TecnicoController {
     return new SuccessResponseDto('Tecnico retrieved successfully', tecnico);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateTecnicoDto) {
     const tecnico = await this.tecnicosService.update(id, dto);
@@ -52,6 +55,7 @@ export class TecnicoController {
     return new SuccessResponseDto('Tecnico updated successfully', tecnico);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const tecnico = await this.tecnicosService.remove(id);

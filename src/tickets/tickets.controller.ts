@@ -1,7 +1,8 @@
 import {
   Controller, Get, Post, Put, Delete,
   Param, Body, Query,
-  NotFoundException, InternalServerErrorException
+  NotFoundException, InternalServerErrorException,
+  UseGuards
 } from '@nestjs/common';
 
 import { TicketsService } from './tickets.service';
@@ -13,11 +14,13 @@ import { Ticket } from './ticket.entity';
 
 import { SuccessResponseDto } from 'src/common/dto/response.dto';
 import { QueryDto } from 'src/common/dto/query.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('tickets')
 export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   async create(@Body() dto: CreateTicketDto) {
     const ticket = await this.ticketsService.create(dto);
@@ -45,6 +48,7 @@ export class TicketsController {
     return new SuccessResponseDto('Ticket retrieved successfully', ticket);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   async update(@Param('id') id: string, @Body() dto: UpdateTicketDto) {
     const ticket = await this.ticketsService.update(id, dto);
@@ -52,6 +56,7 @@ export class TicketsController {
     return new SuccessResponseDto('Ticket updated successfully', ticket);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const ticket = await this.ticketsService.remove(id);
