@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AuthModule } from './auth/auth.module';
+
 import { UsersModule } from './users/users.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CommentsModule } from './comments/comments.module';
@@ -23,7 +23,7 @@ import { Comment } from './comments/comment.entity';
       synchronize: true, 
     }),
 
-    AuthModule,
+
     UsersModule,
     CategoriesModule,
     CommentsModule,
