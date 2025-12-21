@@ -1,40 +1,61 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller, Get, Post, Put, Delete,
+  Param, Body, Query,
+  NotFoundException, InternalServerErrorException
+} from '@nestjs/common';
+
 import { AsignacionTicketService } from './asignacion-ticket.service';
 import { CreateAsignacionTicketDto } from './dto/create-asignacionTicket.dto';
 import { UpdateAsignacionTicketDto } from './dto/update-asignacionTicket.dto';
+
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { AsignacionTicket } from './asignacionTicket.entity';
+
+import { SuccessResponseDto } from 'src/common/dto/response.dto';
+import { QueryDto } from 'src/common/dto/query.dto';
 
 @Controller('asignacionTicket')
 export class AsignacionTicketController {
   constructor(private readonly asignacionTicketService: AsignacionTicketService) {}
 
   @Post()
-  create(@Body() createDto: CreateAsignacionTicketDto) {
-    return this.asignacionTicketService.create(createDto);
+  async create(@Body() dto: CreateAsignacionTicketDto) {
+    const asignacion = await this.asignacionTicketService.create(dto);
+    if (!asignacion) throw new InternalServerErrorException('Failed to create asignacionTicket');
+    return new SuccessResponseDto('AsignacionTicket created successfully', asignacion);
   }
 
   @Get()
-  findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
-  ): Promise<Pagination<AsignacionTicket>> {
-    limit = limit > 100 ? 100 : limit;
-    return this.asignacionTicketService.findAll({ page, limit });
+  async findAll(
+    @Query() query: QueryDto,
+  ): Promise<SuccessResponseDto<Pagination<AsignacionTicket>>> {
+    if (query.limit && query.limit > 100) query.limit = 100;
+
+    const result = await this.asignacionTicketService.findAll(query);
+
+    if (!result) throw new InternalServerErrorException('Could not retrieve asignacionTicket');
+
+    return new SuccessResponseDto('AsignacionTicket retrieved successfully', result);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.asignacionTicketService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const asignacion = await this.asignacionTicketService.findOne(id);
+    if (!asignacion) throw new NotFoundException('AsignacionTicket not found');
+    return new SuccessResponseDto('AsignacionTicket retrieved successfully', asignacion);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateDto: UpdateAsignacionTicketDto) {
-    return this.asignacionTicketService.update(id, updateDto);
+  async update(@Param('id') id: string, @Body() dto: UpdateAsignacionTicketDto) {
+    const asignacion = await this.asignacionTicketService.update(id, dto);
+    if (!asignacion) throw new NotFoundException('AsignacionTicket not found');
+    return new SuccessResponseDto('AsignacionTicket updated successfully', asignacion);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.asignacionTicketService.remove(id);
+  async remove(@Param('id') id: string) {
+    const asignacion = await this.asignacionTicketService.remove(id);
+    if (!asignacion) throw new NotFoundException('AsignacionTicket not found');
+    return new SuccessResponseDto('AsignacionTicket deleted successfully', asignacion);
   }
 }
