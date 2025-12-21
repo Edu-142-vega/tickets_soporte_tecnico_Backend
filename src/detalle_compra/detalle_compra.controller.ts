@@ -1,40 +1,60 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller, Get, Post, Put, Delete,
+  Param, Body, Query, NotFoundException, InternalServerErrorException
+} from '@nestjs/common';
+
 import { Detalle_comprasService } from './detalle_compra.service';
 import { CreateDetalle_compraDto } from './dto/create-detalle_compra.dto';
 import { UpdateDetalle_compraDto } from './dto/update-detalle_compra.dto';
-import { Detalle_compra } from './detalle_compra.entity';
 import { Pagination } from 'nestjs-typeorm-paginate';
+import { Detalle_compra } from './detalle_compra.entity';
+
+import { SuccessResponseDto } from 'src/common/dto/response.dto';
+import { QueryDto } from 'src/common/dto/query.dto';
 
 @Controller('detalle_compras')
 export class Detalle_comprasController {
   constructor(private readonly detalle_comprasService: Detalle_comprasService) {}
 
   @Post()
-  create(@Body() createDetalle_compraDto: CreateDetalle_compraDto) {
-    return this.detalle_comprasService.create(createDetalle_compraDto);
+  async create(@Body() dto: CreateDetalle_compraDto) {
+    const detalle = await this.detalle_comprasService.create(dto);
+    if (!detalle) throw new InternalServerErrorException('Failed to create detalle_compra');
+    return new SuccessResponseDto('Detalle_compra created successfully', detalle);
   }
 
   @Get()
-  findAll(
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
-  ): Promise<Pagination<Detalle_compra>> {
-    limit = limit > 100 ? 100 : limit;
-    return this.detalle_comprasService.findAll({ page, limit });
+  async findAll(
+    @Query() query: QueryDto,
+  ): Promise<SuccessResponseDto<Pagination<Detalle_compra>>> {
+    if (query.limit && query.limit > 100) {
+      query.limit = 100;
+    }
+
+    const result = await this.detalle_comprasService.findAll(query);
+    if (!result) throw new InternalServerErrorException('Could not retrieve detalle_compras');
+
+    return new SuccessResponseDto('Detalle_compras retrieved successfully', result);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.detalle_comprasService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const detalle = await this.detalle_comprasService.findOne(id);
+    if (!detalle) throw new NotFoundException('Detalle_compra not found');
+    return new SuccessResponseDto('Detalle_compra retrieved successfully', detalle);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateDetalle_compraDto: UpdateDetalle_compraDto) {
-    return this.detalle_comprasService.update(id, updateDetalle_compraDto);
+  async update(@Param('id') id: string, @Body() dto: UpdateDetalle_compraDto) {
+    const detalle = await this.detalle_comprasService.update(id, dto);
+    if (!detalle) throw new NotFoundException('Detalle_compra not found');
+    return new SuccessResponseDto('Detalle_compra updated successfully', detalle);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.detalle_comprasService.remove(id);
+  async remove(@Param('id') id: string) {
+    const detalle = await this.detalle_comprasService.remove(id);
+    if (!detalle) throw new NotFoundException('Detalle_compra not found');
+    return new SuccessResponseDto('Detalle_compra deleted successfully', detalle);
   }
 }

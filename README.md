@@ -1,3 +1,5 @@
-nest generate module detalle_compra
-nest generate controller detalle_compra
-nest generate service detalle_compra 
+nest g module mail
+nest g service mail --no-spec
+nest g controller mail --no-spec
+
+bpos soop zhmf injo

@@ -7,8 +7,9 @@ import { TecnicosModule } from './tecnico/tecnico.module';
 import { ServicioModule } from './servicio/servicio.module';
 import { CompraModule } from './compra/compra.module';
 import { Detalle_compraModule } from './detalle_compra/detalle_compra.module';
-
-
+//import { MongooseModule } from '@nestjs/mongoose';  // Importar Mongoose
+import { AuthModule } from './auth/auth.module';
+import { MailModule } from './mail/mail.module';
 
 
 @Module({
@@ -30,6 +31,8 @@ import { Detalle_compraModule } from './detalle_compra/detalle_compra.module';
     ServicioModule,
     CompraModule,
     Detalle_compraModule,
+    AuthModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

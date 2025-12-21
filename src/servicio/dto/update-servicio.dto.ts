@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsIn, IsOptional, IsString } from 'class-validator';
 
 export class UpdateServicioDto {
   @IsOptional()
@@ -10,7 +10,7 @@ export class UpdateServicioDto {
   descripcion?: string;
 
   @IsOptional()
-  @IsString()
+  @IsIn(['servicio', 'producto'])
   tipo?: string;
 
   @IsOptional()
@@ -18,6 +18,10 @@ export class UpdateServicioDto {
   precio?: string;
 
   @IsOptional()
-  @IsString()
+  @IsIn(['disponible', 'no disponible'])
   estado?: string;
+
+  @IsOptional()
+  @IsString()
+  fecha_creacion?: string;
 }

@@ -12,11 +12,11 @@ export class Compra {
   fecha_compra: string;
 
   @Column()
-  metodo_pago: string; // efectivo, tarjeta, transferencia, etc.
+  metodo_pago: string; 
 
   @Column()
   total: string;
 
-  @Column()
-  estado: string; // pagado / pendiente
+  @Column({ default: 'pendiente' })
+  estado: string; 
 }

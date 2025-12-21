@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity('servicios')
 export class Servicio {
@@ -13,13 +13,12 @@ export class Servicio {
 
   @Column()
   tipo: string; 
-
-  @Column('decimal', { precision: 10, scale: 2 })
-  precio: number;
-
   @Column()
+  precio: string;
+
+  @Column({ default: 'disponible' })
   estado: string; 
 
-  @CreateDateColumn()
-  fecha_creacion: Date;
+  @Column()
+  fecha_creacion: string;
 }

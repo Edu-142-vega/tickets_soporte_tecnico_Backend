@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsIn, IsOptional, IsString } from 'class-validator';
 
 export class UpdateCompraDto {
   @IsOptional()
@@ -18,6 +18,6 @@ export class UpdateCompraDto {
   total?: string;
 
   @IsOptional()
-  @IsString()
+  @IsIn(['pagado', 'pendiente'])
   estado?: string;
 }

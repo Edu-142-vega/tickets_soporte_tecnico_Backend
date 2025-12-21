@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsIn, IsOptional, IsString } from 'class-validator';
 
 export class UpdateTecnicoDto {
   @IsOptional()
@@ -10,7 +10,7 @@ export class UpdateTecnicoDto {
   apellido?: string;
 
   @IsOptional()
-  @IsString()
+  @IsEmail()
   correo?: string;
 
   @IsOptional()
@@ -22,6 +22,6 @@ export class UpdateTecnicoDto {
   especialidad?: string;
 
   @IsOptional()
-  @IsString()
-  estado?: string; // activo / inactivo
+  @IsIn(['activo', 'inactivo'])
+  estado?: string;
 }
