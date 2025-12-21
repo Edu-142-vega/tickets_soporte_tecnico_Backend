@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, Query } from '@nestjs/common';
+import {
+  Controller, Get, Post, Put, Delete,
+  Param, Body, Query,
+  NotFoundException, InternalServerErrorException,
+} from '@nestjs/common';
+
 import { CompraService } from './compra.service';
 import { CreateCompraDto } from './dto/create-compra.dto';
 import { UpdateCompraDto } from './dto/update-compra.dto';
+
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { Compra } from './compra.entity';
+
+import { SuccessResponseDto } from 'src/common/dto/response.dto';
 import { QueryDto } from 'src/common/dto/query.dto';
 
 @Controller('compras')
@@ -9,27 +19,42 @@ export class ComprasController {
   constructor(private readonly compraService: CompraService) {}
 
   @Post()
-  create(@Body() dto: CreateCompraDto) {
-    return this.compraService.create(dto);
+  async create(@Body() dto: CreateCompraDto) {
+    const compra = await this.compraService.create(dto);
+    if (!compra) throw new InternalServerErrorException('Failed to create compra');
+    return new SuccessResponseDto('Compra created successfully', compra);
   }
 
   @Get()
-  findAll(@Query() query: QueryDto) {
-    return this.compraService.findAll(query);
+  async findAll(
+    @Query() query: QueryDto,
+  ): Promise<SuccessResponseDto<Pagination<Compra>>> {
+    if (query.limit && query.limit > 100) query.limit = 100;
+
+    const result = await this.compraService.findAll(query);
+    if (!result) throw new InternalServerErrorException('Could not retrieve compras');
+
+    return new SuccessResponseDto('Compras retrieved successfully', result);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.compraService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const compra = await this.compraService.findOne(id);
+    if (!compra) throw new NotFoundException('Compra not found');
+    return new SuccessResponseDto('Compra retrieved successfully', compra);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateCompraDto) {
-    return this.compraService.update(id, dto);
+  async update(@Param('id') id: string, @Body() dto: UpdateCompraDto) {
+    const compra = await this.compraService.update(id, dto);
+    if (!compra) throw new NotFoundException('Compra not found');
+    return new SuccessResponseDto('Compra updated successfully', compra);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.compraService.remove(id);
+  async remove(@Param('id') id: string) {
+    const compra = await this.compraService.remove(id);
+    if (!compra) throw new NotFoundException('Compra not found');
+    return new SuccessResponseDto('Compra deleted successfully', compra);
   }
 }

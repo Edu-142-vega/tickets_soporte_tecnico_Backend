@@ -1,6 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike } from 'typeorm';
+import { Repository } from 'typeorm';
+import { paginate, Pagination } from 'nestjs-typeorm-paginate';
+
 import { Compra } from './compra.entity';
 import { CreateCompraDto } from './dto/create-compra.dto';
 import { UpdateCompraDto } from './dto/update-compra.dto';
@@ -13,77 +15,106 @@ export class CompraService {
     private readonly compraRepository: Repository<Compra>,
   ) {}
 
-  async create(dto: CreateCompraDto) {
-    const compra = this.compraRepository.create(dto);
-    return await this.compraRepository.save(compra);
-  }
-
-  async findAll(query: QueryDto) {
-    const { page, limit, search, searchField, sort, order } = query;
-
-
-    const allowedSearchFields: (keyof Compra)[] = [
-      'id_cliente',
-      'fecha_compra',
-      'metodo_pago',
-      'total',
-      'estado',
-    ];
-
-
-    const allowedSortFields: (keyof Compra)[] = [
-      'fecha_compra',
-      'total',
-      'estado',
-      'metodo_pago',
-      'id_cliente',
-    ];
-
-    const where: any = {};
-    if (search) {
-      if (!searchField) {
-        throw new BadRequestException('Debes enviar searchField cuando uses search');
-      }
-      if (!allowedSearchFields.includes(searchField as keyof Compra)) {
-        throw new BadRequestException(`searchField no permitido: ${searchField}`);
-      }
-      where[searchField] = ILike(`%${search}%`);
+  async create(dto: CreateCompraDto): Promise<Compra | null> {
+    try {
+      const compra = this.compraRepository.create(dto);
+      return await this.compraRepository.save(compra);
+    } catch (err) {
+      console.error('Error creating compra:', err);
+      return null;
     }
-
-    const sortField = sort && allowedSortFields.includes(sort as keyof Compra) ? sort : undefined;
-    const sortOrder = order || 'ASC';
-
-    const [items, totalItems] = await this.compraRepository.findAndCount({
-      where,
-      order: sortField ? { [sortField]: sortOrder } : undefined,
-      skip: (page - 1) * limit,
-      take: limit,
-    });
-
-    return {
-      items,
-      totalItems,
-      page,
-      limit,
-      totalPages: Math.ceil(totalItems / limit),
-    };
   }
 
-  async findOne(id: string) {
-    const compra = await this.compraRepository.findOne({ where: { id_compra: id } });
-    if (!compra) throw new NotFoundException('Compra no encontrada');
-    return compra;
+  async findAll(queryDto: QueryDto): Promise<Pagination<Compra> | null> {
+    try {
+      const { page, limit, search, searchField, sort, order } = queryDto;
+
+      const query = this.compraRepository.createQueryBuilder('compra');
+
+      // 🔎 Search (opcional)
+      if (search) {
+        if (searchField) {
+          switch (searchField) {
+            case 'id_cliente':
+              query.where('compra.id_cliente ILIKE :search', { search: `%${search}%` });
+              break;
+            case 'fecha_compra':
+              query.where('compra.fecha_compra ILIKE :search', { search: `%${search}%` });
+              break;
+            case 'metodo_pago':
+              query.where('compra.metodo_pago ILIKE :search', { search: `%${search}%` });
+              break;
+            case 'total':
+              query.where('compra.total ILIKE :search', { search: `%${search}%` });
+              break;
+            case 'estado':
+              query.where('compra.estado ILIKE :search', { search: `%${search}%` });
+              break;
+            default:
+              query.where(
+                `(compra.id_cliente ILIKE :search
+                  OR compra.fecha_compra ILIKE :search
+                  OR compra.metodo_pago ILIKE :search
+                  OR compra.total ILIKE :search
+                  OR compra.estado ILIKE :search)`,
+                { search: `%${search}%` },
+              );
+          }
+        } else {
+          query.where(
+            `(compra.id_cliente ILIKE :search
+              OR compra.fecha_compra ILIKE :search
+              OR compra.metodo_pago ILIKE :search
+              OR compra.total ILIKE :search
+              OR compra.estado ILIKE :search)`,
+            { search: `%${search}%` },
+          );
+        }
+      }
+
+      // ↕️ Sort (opcional)
+      if (sort) {
+        query.orderBy(`compra.${sort}`, (order ?? 'ASC') as 'ASC' | 'DESC');
+      }
+
+      return await paginate<Compra>(query, { page, limit });
+    } catch (err) {
+      console.error('Error retrieving compras:', err);
+      return null;
+    }
   }
 
-  async update(id: string, dto: UpdateCompraDto) {
-    const compra = await this.findOne(id);
-    Object.assign(compra, dto);
-    return await this.compraRepository.save(compra);
+  async findOne(id: string): Promise<Compra | null> {
+    try {
+      return await this.compraRepository.findOne({ where: { id_compra: id } });
+    } catch (err) {
+      console.error('Error finding compra:', err);
+      return null;
+    }
   }
 
-  async remove(id: string) {
-    const compra = await this.findOne(id);
-    await this.compraRepository.remove(compra);
-    return { deleted: true };
+  async update(id: string, dto: UpdateCompraDto): Promise<Compra | null> {
+    try {
+      const compra = await this.findOne(id);
+      if (!compra) return null;
+
+      Object.assign(compra, dto);
+      return await this.compraRepository.save(compra);
+    } catch (err) {
+      console.error('Error updating compra:', err);
+      return null;
+    }
+  }
+
+  async remove(id: string): Promise<Compra | null> {
+    try {
+      const compra = await this.findOne(id);
+      if (!compra) return null;
+
+      return await this.compraRepository.remove(compra);
+    } catch (err) {
+      console.error('Error deleting compra:', err);
+      return null;
+    }
   }
 }
