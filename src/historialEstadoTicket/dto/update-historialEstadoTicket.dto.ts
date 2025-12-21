@@ -1,21 +1,21 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsUUID, IsDateString } from 'class-validator';
 
 export class UpdateHistorialEstadoTicketDto {
-  @IsString()
   @IsOptional()
-  id_ticket: string;
+  @IsUUID()
+  id_ticket?: string;
 
-  @IsString()
   @IsOptional()
-  estado_anterior: string;
+  @IsString()
+  estado_anterior?: string;
 
-  @IsString()
   @IsOptional()
-  estado_nuevo: string;
+  @IsString()
+  estado_nuevo?: string;
 
-  @IsString()
   @IsOptional()
-  fecha_cambio: Date;
+  @IsDateString()
+  fecha_cambio?: string;
 
   @IsOptional()
   @IsString()

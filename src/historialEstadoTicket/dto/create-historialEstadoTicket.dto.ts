@@ -1,17 +1,21 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID, IsDateString, IsOptional } from 'class-validator';
 
 export class CreateHistorialEstadoTicketDto {
-  @IsString()
+  @IsUUID()
+  @IsNotEmpty()
   id_ticket: string;
 
   @IsString()
+  @IsNotEmpty()
   estado_anterior: string;
 
   @IsString()
+  @IsNotEmpty()
   estado_nuevo: string;
 
-  @IsString()
-  fecha_cambio: Date;
+  @IsDateString()
+  @IsNotEmpty()
+  fecha_cambio: string;
 
   @IsOptional()
   @IsString()
