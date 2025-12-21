@@ -1,12 +1,15 @@
-import { IsString } from 'class-validator';
+import { IsUUID, IsDateString, IsNotEmpty } from 'class-validator';
 
 export class CreateAsignacionTicketDto {
-  @IsString()
+  @IsUUID()
+  @IsNotEmpty()
   id_ticket: string;
 
-  @IsString()
+  @IsUUID()
+  @IsNotEmpty()
   id_tecnico: string;
 
-  @IsString()
-  fecha_asignacion: Date;
+  @IsDateString()
+  @IsNotEmpty()
+  fecha_asignacion: string;
 }

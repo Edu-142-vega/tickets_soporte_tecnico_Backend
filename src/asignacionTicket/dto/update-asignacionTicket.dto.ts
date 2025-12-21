@@ -1,15 +1,15 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsUUID, IsDateString, IsOptional } from 'class-validator';
 
 export class UpdateAsignacionTicketDto {
-  @IsString()
   @IsOptional()
-  id_ticket: string;
+  @IsUUID()
+  id_ticket?: string;
 
-  @IsString()
   @IsOptional()
-  id_tecnico: string;
+  @IsUUID()
+  id_tecnico?: string;
 
-  @IsString()
   @IsOptional()
-  fecha_asignacion: Date;
+  @IsDateString()
+  fecha_asignacion?: string;
 }
