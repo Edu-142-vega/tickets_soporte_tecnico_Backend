@@ -12,10 +12,14 @@ import { CompraModule } from './compra/compra.module';
 import { Detalle_compraModule } from './detalle_compra/detalle_compra.module';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
+import { UsersModule } from './users/users.module';
+import { CategoriesModule } from './categories/categories.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -26,6 +30,9 @@ import { MailModule } from './mail/mail.module';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
+    UsersModule,
+    CategoriesModule,
+    CommentsModule,
     TicketsModule,
     AsignacionTicketModule,
     HistorialEstadoTicketModule,
