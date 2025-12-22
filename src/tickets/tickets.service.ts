@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 
 import { Ticket } from './ticket.entity';
@@ -27,48 +27,34 @@ export class TicketsService {
 
   async findAll(queryDto: QueryDto): Promise<Pagination<Ticket> | null> {
     try {
-      const { page, limit, search, searchField, sort, order } = queryDto;
+      const page = queryDto.page ?? 1;
+      const limit = queryDto.limit ?? 10;
+      const { search, searchField, sort, order } = queryDto;
+      let where: any = {};
 
-      const query = this.ticketRepository.createQueryBuilder('ticket');
-      
       if (search) {
         if (searchField) {
-          switch (searchField) {
-            case 'titulo':
-              query.where('ticket.titulo ILIKE :search', { search: `%${search}%` });
-              break;
-
-            case 'descripcion':
-              query.where('ticket.descripcion ILIKE :search', { search: `%${search}%` });
-              break;
-
-            case 'estado':
-              query.where('ticket.estado ILIKE :search', { search: `%${search}%` });
-              break;
-
-            case 'prioridad':
-              query.where('ticket.prioridad ILIKE :search', { search: `%${search}%` });
-              break;
-
-            default:
-              query.where(
-                `(ticket.titulo ILIKE :search OR ticket.descripcion ILIKE :search OR ticket.estado ILIKE :search OR ticket.prioridad ILIKE :search)`,
-                { search: `%${search}%` },
-              );
-          }
+          where[searchField] = ILike(`%${search}%`);
         } else {
-          query.where(
-            `(ticket.titulo ILIKE :search OR ticket.descripcion ILIKE :search OR ticket.estado ILIKE :search OR ticket.prioridad ILIKE :search)`,
-            { search: `%${search}%` },
-          );
+          where = [
+            { titulo: ILike(`%${search}%`) },
+            { descripcion: ILike(`%${search}%`) },
+            { estado: ILike(`%${search}%`) },
+            { prioridad: ILike(`%${search}%`) },
+          ];
         }
       }
 
-      if (sort) {
-        query.orderBy(`ticket.${sort}`, (order ?? 'ASC') as 'ASC' | 'DESC');
-      }
-
-      return await paginate<Ticket>(query, { page, limit });
+      return await paginate<Ticket>(
+        this.ticketRepository,
+        { page, limit },
+        {
+          where,
+          order: sort
+            ? { [sort]: (order ?? 'ASC').toUpperCase() as 'ASC' | 'DESC' }
+            : undefined,
+        },
+      );
     } catch (err) {
       console.error('Error retrieving tickets:', err);
       return null;

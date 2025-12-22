@@ -10,15 +10,6 @@ import { QueryDto } from 'src/common/dto/query.dto';
 
 @Injectable()
 export class HistorialEstadoTicketService {
-  remove(id: string) {
-    throw new Error('Method not implemented.');
-  }
-  update(id: string, dto: UpdateHistorialEstadoTicketDto) {
-    throw new Error('Method not implemented.');
-  }
-  findOne(id: string) {
-    throw new Error('Method not implemented.');
-  }
   constructor(
     @InjectRepository(HistorialEstadoTicket)
     private readonly historialRepository: Repository<HistorialEstadoTicket>,
@@ -36,7 +27,9 @@ export class HistorialEstadoTicketService {
 
   async findAll(queryDto: QueryDto): Promise<Pagination<HistorialEstadoTicket> | null> {
     try {
-      const { page, limit, search, searchField, sort, order } = queryDto;
+      const { search, searchField, sort, order } = queryDto;
+      const page = queryDto.page ?? 1;
+      const limit = queryDto.limit ?? 10;
 
       const query = this.historialRepository.createQueryBuilder('historial');
 
@@ -75,4 +68,76 @@ export class HistorialEstadoTicketService {
 
             default:
               query.where(
-                `(historial.id_ticket::text ILIKE :search OR historial.estado_anterior ILIKE :search OR historial.estado_nuevo IL_
+                `(historial.id_ticket::text ILIKE :search 
+                  OR historial.estado_anterior ILIKE :search 
+                  OR historial.estado_nuevo ILIKE :search 
+                  OR historial.fecha_cambio::text ILIKE :search 
+                  OR historial.comentario ILIKE :search)`,
+                { search: `%${search}%` },
+              );
+          }
+        } else {
+          query.where(
+            `(historial.id_ticket::text ILIKE :search 
+              OR historial.estado_anterior ILIKE :search 
+              OR historial.estado_nuevo ILIKE :search 
+              OR historial.fecha_cambio::text ILIKE :search 
+              OR historial.comentario ILIKE :search)`,
+            { search: `%${search}%` },
+          );
+        }
+      }
+
+      if (sort) {
+        query.orderBy(
+          `historial.${sort}`,
+          ((order ?? 'ASC').toUpperCase() as 'ASC' | 'DESC'),
+        );
+      }
+
+      return await paginate<HistorialEstadoTicket>(query, { page, limit });
+    } catch (err) {
+      console.error('Error retrieving historialEstadoTicket:', err);
+      return null;
+    }
+  }
+
+  async findOne(id: string): Promise<HistorialEstadoTicket | null> {
+    try {
+      return await this.historialRepository.findOne({
+        where: { id_historial: id },
+      });
+    } catch (err) {
+      console.error('Error finding historialEstadoTicket:', err);
+      return null;
+    }
+  }
+
+  async update(
+    id: string,
+    dto: UpdateHistorialEstadoTicketDto,
+  ): Promise<HistorialEstadoTicket | null> {
+    try {
+      const historial = await this.findOne(id);
+      if (!historial) return null;
+
+      Object.assign(historial, dto);
+      return await this.historialRepository.save(historial);
+    } catch (err) {
+      console.error('Error updating historialEstadoTicket:', err);
+      return null;
+    }
+  }
+
+  async remove(id: string): Promise<HistorialEstadoTicket | null> {
+    try {
+      const historial = await this.findOne(id);
+      if (!historial) return null;
+
+      return await this.historialRepository.remove(historial);
+    } catch (err) {
+      console.error('Error deleting historialEstadoTicket:', err);
+      return null;
+    }
+  }
+}
