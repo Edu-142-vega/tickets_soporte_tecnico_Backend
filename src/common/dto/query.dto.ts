@@ -15,7 +15,6 @@ export class QueryDto {
   @Max(100)
   limit?: number = 10;
 
-
   @IsOptional()
   @IsString()
   search?: string;
@@ -23,7 +22,6 @@ export class QueryDto {
   @IsOptional()
   @IsString()
   searchField?: string;
-
 
   @IsOptional()
   @IsString()
