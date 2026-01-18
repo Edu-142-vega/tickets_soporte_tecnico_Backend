@@ -1,114 +1,53 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Test } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { paginate, Pagination } from 'nestjs-typeorm-paginate';
-
+import { AsignacionTicketService } from './asignacion-ticket.service';
 import { AsignacionTicket } from './asignacionTicket.entity';
-import { CreateAsignacionTicketDto } from './dto/create-asignacionTicket.dto';
-import { UpdateAsignacionTicketDto } from './dto/update-asignacionTicket.dto';
-import { QueryDto } from 'src/common/dto/query.dto';
+import { paginate } from 'nestjs-typeorm-paginate';
 
-@Injectable()
-export class AsignacionTicketService {
-  constructor(
-    @InjectRepository(AsignacionTicket)
-    private readonly asignacionRepository: Repository<AsignacionTicket>,
-  ) {}
+jest.mock('nestjs-typeorm-paginate', () => ({
+  paginate: jest.fn(),
+}));
 
-  async create(dto: CreateAsignacionTicketDto): Promise<AsignacionTicket | null> {
-    try {
-      const asignacion = this.asignacionRepository.create(dto);
-      return await this.asignacionRepository.save(asignacion);
-    } catch (err) {
-      console.error('Error creating asignacionTicket:', err);
-      return null;
-    }
-  }
+describe('AsignacionTicketService', () => {
+  let service: AsignacionTicketService;
+  let repo: jest.Mocked<Repository<AsignacionTicket>>;
 
-  async findAll(queryDto: QueryDto): Promise<Pagination<AsignacionTicket> | null> {
-    try {
-      const { page, limit, search, searchField, sort, order } = queryDto;
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+      providers: [
+        AsignacionTicketService,
+        {
+          provide: getRepositoryToken(AsignacionTicket),
+          useValue: {
+            create: jest.fn(),
+            save: jest.fn(),
+            findOne: jest.fn(),
+            remove: jest.fn(),
+            createQueryBuilder: jest.fn(),
+          },
+        },
+      ],
+    }).compile();
 
-      const query = this.asignacionRepository.createQueryBuilder('asignacion');
+    service = module.get(AsignacionTicketService);
+    repo = module.get(getRepositoryToken(AsignacionTicket));
+  });
 
-      if (search) {
-        if (searchField) {
-          switch (searchField) {
-            case 'id_ticket':
-              query.where('asignacion.id_ticket::text ILIKE :search', {
-                search: `%${search}%`,
-              });
-              break;
+  it('create: crea asignacion', async () => {
+    repo.create.mockReturnValue({} as any);
+    repo.save.mockResolvedValue({ id_asignacion: '1' } as any);
 
-            case 'id_tecnico':
-              query.where('asignacion.id_tecnico::text ILIKE :search', {
-                search: `%${search}%`,
-              });
-              break;
+    const res = await service.create({} as any);
+    expect(res).toBeDefined();
+  });
 
-            case 'fecha_asignacion':
-              query.where('asignacion.fecha_asignacion::text ILIKE :search', {
-                search: `%${search}%`,
-              });
-              break;
+  it('findAll: pagina resultados', async () => {
+    const qb: any = {};
+    repo.createQueryBuilder.mockReturnValue(qb);
+    (paginate as jest.Mock).mockResolvedValue({ items: [] });
 
-            default:
-              query.where(
-                `(asignacion.id_ticket::text ILIKE :search OR asignacion.id_tecnico::text ILIKE :search OR asignacion.fecha_asignacion::text ILIKE :search)`,
-                { search: `%${search}%` },
-              );
-          }
-        } else {
-          query.where(
-            `(asignacion.id_ticket::text ILIKE :search OR asignacion.id_tecnico::text ILIKE :search OR asignacion.fecha_asignacion::text ILIKE :search)`,
-            { search: `%${search}%` },
-          );
-        }
-      }
-      if (sort) {
-        query.orderBy(`asignacion.${sort}`, (order ?? 'ASC') as 'ASC' | 'DESC');
-      }
-
-      return await paginate<AsignacionTicket>(query, { page, limit });
-    } catch (err) {
-      console.error('Error retrieving asignacionTicket:', err);
-      return null;
-    }
-  }
-
-  async findOne(id: string): Promise<AsignacionTicket | null> {
-    try {
-      return await this.asignacionRepository.findOne({
-        where: { id_asignacion: id },
-      });
-    } catch (err) {
-      console.error('Error finding asignacionTicket:', err);
-      return null;
-    }
-  }
-
-  async update(id: string, dto: UpdateAsignacionTicketDto): Promise<AsignacionTicket | null> {
-    try {
-      const asignacion = await this.findOne(id);
-      if (!asignacion) return null;
-
-      Object.assign(asignacion, dto);
-      return await this.asignacionRepository.save(asignacion);
-    } catch (err) {
-      console.error('Error updating asignacionTicket:', err);
-      return null;
-    }
-  }
-
-  async remove(id: string): Promise<AsignacionTicket | null> {
-    try {
-      const asignacion = await this.findOne(id);
-      if (!asignacion) return null;
-
-      return await this.asignacionRepository.remove(asignacion);
-    } catch (err) {
-      console.error('Error deleting asignacionTicket:', err);
-      return null;
-    }
-  }
-}
+    const res = await service.findAll({ page: 1, limit: 10 });
+    expect(res).toBeDefined();
+  });
+});
