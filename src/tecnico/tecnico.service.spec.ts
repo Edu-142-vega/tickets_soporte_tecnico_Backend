@@ -12,6 +12,7 @@ describe('TecnicoService', () => {
     service = module.get<TecnicoService>(TecnicoService);
   });
 
+  
   it('should be defined', () => {
     expect(service).toBeDefined();
   });

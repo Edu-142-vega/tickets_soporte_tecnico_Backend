@@ -21,7 +21,7 @@ describe('MailService', () => {
     it('should return success when sending mail', async () => {
       const dto: SendMailDto = { to: 'test@mail.com', subject: 'Hola', body: 'Cuerpo' } as any;
 
-      // Simulamos la función sin enviar correo real
+    
       jest.spyOn(service, 'sendMail').mockResolvedValue({ success: true } as any);
 
       const result = await service.sendMail(dto);
