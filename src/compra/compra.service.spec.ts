@@ -1,18 +1,33 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { CompraService } from './compra.service';
 
 describe('CompraService', () => {
   let service: CompraService;
 
+  const compraRepoMock = {
+    create: jest.fn(),
+    save: jest.fn(),
+    find: jest.fn(),
+    findOne: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    remove: jest.fn(),
+    createQueryBuilder: jest.fn(),
+  };
+
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [CompraService],
+    const module = await Test.createTestingModule({
+      providers: [
+        CompraService,
+        { provide: 'CompraRepository', useValue: compraRepoMock },
+      ],
     }).compile();
 
-    service = module.get<CompraService>(CompraService);
+    service = module.get(CompraService);
+    jest.clearAllMocks();
   });
 
-  it('should be defined', () => {
+  it('service definido', () => {
     expect(service).toBeDefined();
   });
 });

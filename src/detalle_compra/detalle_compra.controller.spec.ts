@@ -1,18 +1,33 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { DetalleCompraController } from './detalle_compra.controller';
+import { Test } from '@nestjs/testing';
+import { AuthGuard } from '@nestjs/passport';
 
-describe('DetalleCompraController', () => {
-  let controller: DetalleCompraController;
+import { Detalle_comprasController } from './detalle_compra.controller'; // 👈 debe existir
+import { Detalle_comprasService } from './detalle_compra.service';
+
+describe('Detalle_comprasController', () => {
+  let controller: Detalle_comprasController;
+
+  const serviceMock = {
+    create: jest.fn(),
+    findAll: jest.fn(),
+    findOne: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
+  };
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [DetalleCompraController],
-    }).compile();
+    const module = await Test.createTestingModule({
+      controllers: [Detalle_comprasController],
+      providers: [{ provide: Detalle_comprasService, useValue: serviceMock }],
+    })
+      .overrideGuard(AuthGuard('jwt'))
+      .useValue({ canActivate: () => true })
+      .compile();
 
-    controller = module.get<DetalleCompraController>(DetalleCompraController);
+    controller = module.get(Detalle_comprasController);
   });
 
-  it('should be defined', () => {
+  it('controller definido', () => {
     expect(controller).toBeDefined();
   });
 });
