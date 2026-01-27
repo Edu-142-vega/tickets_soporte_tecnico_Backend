@@ -11,7 +11,6 @@ import { UpdateAsignacionTicketDto } from './dto/update-asignacionTicket.dto';
 
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { AsignacionTicket } from './asignacionTicket.entity';
-
 import { SuccessResponseDto } from 'src/common/dto/response.dto';
 import { QueryDto } from 'src/common/dto/query.dto';
 import { AuthGuard } from '@nestjs/passport';
