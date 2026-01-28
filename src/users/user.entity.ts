@@ -16,5 +16,4 @@ export class User {
 
   @CreateDateColumn()
   createdAt: Date;
-    username: any;
 }

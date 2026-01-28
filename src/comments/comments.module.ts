@@ -6,7 +6,7 @@ import { Comment } from './comment.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Comment]), // 🔥 CLAVE
+    TypeOrmModule.forFeature([Comment]),
   ],
   controllers: [CommentsController],
   providers: [CommentsService],

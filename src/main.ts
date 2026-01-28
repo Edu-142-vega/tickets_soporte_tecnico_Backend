@@ -2,11 +2,13 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { GlobalHttpExceptionFilter } from './common/filters/http-exception.filter';
+import { DataSource } from 'typeorm';
+import { seedUsers } from './db/seeds/user.seed';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // ✅ CORS para Vite (5173 / 5174)
+  // ✅ Configuración de CORS
   app.enableCors({
     origin: [
       'http://localhost:5173',
@@ -29,6 +31,15 @@ async function bootstrap() {
 
   app.useGlobalFilters(new GlobalHttpExceptionFilter());
 
+  // 🚀 EJECUTAR SEMILLA ANTES DE ARRANCAR
+  const dataSource = app.get(DataSource);
+  try {
+    await seedUsers(dataSource);
+  } catch (error) {
+    console.error('❌ Error ejecutando el seed:', error);
+  }
+
   await app.listen(3000);
+  console.log('🚀 Servidor listo en http://localhost:3000');
 }
 bootstrap();

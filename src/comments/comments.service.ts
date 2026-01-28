@@ -58,7 +58,6 @@ export class CommentsService {
     }
   }
 
-  // ✅ UPDATE
   async update(
     id: number,
     dto: UpdateCommentDto,
